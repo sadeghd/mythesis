@@ -23,4 +23,4 @@ CM-Super package, which contains Type 1 Computer Modern font, is freely availabl
 ## XDVIPDFMX-ERROR
 [http://stackoverflow.com/questions/4110035/import-pdf-file-into-xelatex-gives-pdf-link-obj-passed-invalid-object-error]
 
-pdftk images/fig2-access-sets.pdf output images/fig2-access-sets2.pdf
+`pdftk images/fig2-access-sets.pdf output images/fig2-access-sets2.pdf`
