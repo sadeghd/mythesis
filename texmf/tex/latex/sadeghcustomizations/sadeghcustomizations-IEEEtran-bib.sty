@@ -1,0 +1,51 @@
+% Package for Sadegh-XePersian customizations
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sadeghcustomizations-IEEEtran-bib}[2012/12/31 Sadegh-XePersian IEEE Transactions Customizations]
+
+%% IEEEtranSA version 1.13 (2008/09/3) is tested and supported -- see texmf/bibtex/bst/IEEEtran
+
+%\citestyle{}
+% IEEEtran BibTeX style special control command (\bstctlcite). See its guide for more info.
+%\makeatletter
+\def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
+\def\@bstctlcite[#1]#2{\@bsphack
+\@for\@citeb:=#2\do{%
+   	\edef\@citeb{\expandafter\@firstofone\@citeb}%
+    \if@filesw\immediate\write\csname #1\endcsname{\string\citation{\@citeb}}\fi}%
+\@esphack}
+%\makeatother
+\AtBeginDocument{\bstctlcite{sadeghcustomizations:BSTcontrol}} % activate sadeghcustomizations-IEEEtran_biboptions.bib options
+
+\DeclareRobustCommand*{\mycite}[2][]{% citation, just like \citep optional params: chapter or page number (a right to left thing!). 
+  \ifthenelse{\isempty{#1}}%
+  		{\lr{\cite{#2}}}% if #1 empty: mycite{sth}
+  		{\lr{\cite[\rl{#1}]{#2}}}% if #1 is not empty: mycite[sth1]{sth2}
+}
+
+\DeclareRobustCommand*{\نقلم}[2][]{\mycite[#1]{#2}}  % just the same as \mycite
+
+\bibliographystyle{IEEEtranSA} %alpha or amsalpha or ieeetr. Control options of this style are put in IEEEtran_biboptions.bib file and activated just after \begin{document}
+
+%%NOTE:  issuing \pagestyle{fancy} (by package fancyhdr) also makes \chapter defined, but \pagestyle{plain} or merely loading the package does not.
+\DeclareRobustCommand{\ieeefabibliography}[1]{%
+	\phantomsection % hyperref: enable hyperlinking from the table of contents to this point
+\ifx\sadegh@wehavechapter\undefined %
+	\addcontentsline{toc}{section}{فهرست مراجع} % add a line in the Table of Contents (first option, toc), it will be like the ones created by chapters (second option, chapter)
+	\renewcommand{\refname}{\rl{فهرست مراجع}} % title of the bibliography chapter for the report and book styles. redefine \refname for the references section of an article
+	\section*{فهرست مراجع} % custom chapter, because in latin env, title goes LTR
+\else %
+	\addcontentsline{toc}{chapter}{فهرست مراجع} % add a line in the Table of Contents (first option, toc), it will be like the ones created by chapters (second option, chapter)
+	\renewcommand{\bibname}{\rl{فهرست مراجع}} % title of the bibliography chapter for the report and book styles. redefine \refname for the references section of an article
+	\chapter*{فهرست مراجع} % custom chapter, because in latin env, title goes LTR
+\fi
+	{ %Disable chapter command for bibliography just in this block!
+\ifx\sadegh@wehavechapter\undefined %
+	\renewcommand{\section}[2]{} % disable the automatic chapter
+\else %
+	\renewcommand{\chapter}[2]{} % disable the automatic chapter
+\fi
+	\begin{latin} % can use \setRTLbibitems in newer versions of xerpersian
+	\bibliography{sadeghcustomizations-IEEEtran-biboptions,#1} % IEEEtran_biboptions provides the customization options activated before by \bstctlcite
+	\end{latin}%
+}}
+

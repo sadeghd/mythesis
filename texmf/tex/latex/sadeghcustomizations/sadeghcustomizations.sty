@@ -1,0 +1,151 @@
+% Package for Sadegh-XePersian customizations
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sadeghcustomizations}[2013/1/10 Sadegh-XePersian Customizations]
+
+%%%% Define options %%%%
+
+\DeclareOption{nocolor}{
+	\newcommand{\sadegh@nocolor}{true}
+}
+
+\DeclareOption{nominitoc}{
+	\newcommand{\sadegh@nominitoc}{true}
+}
+
+\DeclareOption{noglossaries}{
+	\newcommand{\sadegh@noglossaries}{true}
+}
+
+\ProcessOptions\relax
+
+\RequirePackage{xifthen}
+
+%%NOTE:  issuing \pagestyle{fancy} (by package fancyhdr) also makes \chapter defined, but \pagestyle{plain} or merely loading the package does not.
+\ifthenelse{\isnamedefined{chapter}}%
+{\newcommand{\sadegh@wehavechapter}{true}} %
+{} %
+
+% == Footnote fixes == %
+\RequirePackage[bottom]{footmisc}  %bottom option: to fix the behavior: a footnote and a figure with b (bottom) placement on the same page, then the figure will be placed under the footnote. perpage option to enclose Footnote Numbers within a Page doesn't work and perpage or zref-perpage package must be used. perpage package clashes with sth because it uses zref (same counter...). The command is added after using the xepersian package because it works so...
+
+%\RequirePackage{pfnote} doesn't work!
+%\RequirePackage{dblfnote}
+\AtBeginDocument{\interfootnotelinepenalty=10000} % prevent LaTeX from splitting footnotes across pages
+% == Footnote fixes == %
+
+%%%% Plotting %%%%
+\RequirePackage{gnuplottex}
+\RequirePackage{rotating} % rotate objects and floats
+\RequirePackage{pbox} % to put some lines of text in an autosized box in a figure
+\RequirePackage{tikz} 
+\RequirePackage{pgfplots}
+\usepgfplotslibrary{external} % use pgfplots automatic externalization
+\pgfplotsset{compat=1.6} % avoid warning
+\tikzexternalize % use pgfplots automatic externalization
+% use xelatex for pgfplots automatic externalization. see 'texdoc pgf' section 32.4 Externalizing Graphics:
+\tikzset{external/system call={xelatex \tikzexternalcheckshellescape -halt-on-error %
+-interaction=batchmode -jobname "\image" "\texsource"}}
+
+\RequirePackage{graphicx} % inserting images
+
+\RequirePackage{amsfonts,amsmath,amssymb,amsthm} % for \DeclareMathOperator and AMS symbols
+\RequirePackage{setspace} % for switching between double/single space in document
+%\RequirePackage{parskip} % paragraphs are separated by some space, but not indented
+\RequirePackage{fancyhdr} % package for changing Headings style
+% setting the margins of page
+\RequirePackage{enumerate}
+\RequirePackage{booktabs}
+\RequirePackage{multicol} % multicolumn page
+\RequirePackage{multirow}
+%\RequirePackage[sort,compress,numbers]{natbib}
+%\RequirePackage{dblfnote} %Make Footnotes Double-Columned does not work correctly.
+%\RequirePackage{listings}
+%\RequirePackage{fullpage}
+
+%\RequirePackage{microtype} % disable ligatures only works with pdflatex
+%\DisableLigatures[f]{encoding = *, family = *} % HOW TO DO IT WITH XeLaTeX
+
+%\RequirePackage{subfigure} % seems incompatible with xepersian!
+
+\ifx\sadegh@nocolor\undefined
+	% custom colors for hyperref
+	\RequirePackage{color}
+	\definecolor{darkred}{rgb}{0.5,0,0}     % Web color: Maroon
+	\definecolor{darkgreen}{rgb}{0,0.5,0}   % Web color: Green
+    \definecolor{darkblue}{rgb}{0,0,0.5}    % Web color: Navy
+	\RequirePackage[xetex,colorlinks,bookmarksnumbered,linkcolor=darkblue, citecolor=darkred, urlcolor=darkgreen]{hyperref} 
+\else
+	\RequirePackage[xetex,hidelinks,bookmarksnumbered]{hyperref}
+\fi
+
+\RequirePackage{url}
+\RequirePackage[all]{hypcap} % fix hyperref to point to the figure/table instead of its caption. Must be loaded after hyperref.
+
+\ifx\sadegh@noglossaries\undefined
+	\RequirePackage[xindy,sanitize={name=true,description=false,symbol=true},sanitizesort=true]{glossaries} % must be after hyperref for links. Special handling is required for latin toc section, so better to disable toc.
+\fi
+
+\ifx\sadegh@nominitoc\undefined
+	\RequirePackage{minitoc} 
+\else
+	\RequirePackage{mtcoff} % dummy package instead of minitoc
+\fi
+
+
+%%% IMPORTANT: ALL FARSI THINGS MUST BE DONE AFTER XEPERISAN OTHERWISE, THEY MAY BE OVERRIDEN OR INEFFECTIVE %%%
+\RequirePackage{xepersian}[2012/07/25] % we are tested against xepersian v11.143 and bidi v11.161
+
+% Reset footnotes on each page does not work before xepersian
+\RequirePackage{zref-perpage}
+\zmakeperpage{footnote} % \usepackage[perpage]{footmisc} uses zref to reset footnote numbers each page.
+
+\ifx\sadegh@noglossaries\undefined
+	\RequirePackage{sadeghcustomizations-glossary}
+\fi
+
+\def\sectionautorefname{بخش} % localizing \autoref{}
+\def\subsectionautorefname{بخش} % localizing \autoref{}
+\def\chapterautorefname{فصل} % localizing \autoref{}
+\def\itemautorefname{بند} % localizing \autoref{}
+\def\figureautorefname{شکل} % localizing \autoref{}
+\def\equationautorefname{رابطهٔ} % localizing \autoref{}
+\def\tableautorefname{جدول} % localizing \autoref{}
+\def\pageautorefname{صفحهٔ} % localizing \autoref{}
+\def\footnoteautorefname{پاورقی} % localizing \autoref{}
+\DeclareRobustCommand{\listfigurename}{فهرست شکل‌ها}
+\DeclareRobustCommand{\listtablename}{فهرست جدول‌ها}
+
+% Fix blank pages in a twoside, openright document to not show header/footer. see fancyhdr doc on section "those blank pages"
+%\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
+\hbox{}
+%\vspace*{\fill}
+%\begin{center}
+%\textit{[این صفحه عمداً خالی گذاشته شده است.]} % Some printers have difficulty printing these pages.
+%\end{center}
+%\vspace{\fill}
+\thispagestyle{empty}
+\newpage
+\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+%\makeatother
+% end of fix
+
+\ifx\sadegh@nominitoc\undefined
+	%\nomtcrule % disable rulers before and after the minitoc
+	%\tightmtctrue % use less space between minitoc lines
+	\setcounter{minitocdepth}{1} % show just sections
+	\setlength{\mtcindent}{12pt} % two-side indentation 
+	\DeclareRobustCommand{\mtcfont}{\small\rm} % font size
+	\DeclareRobustCommand{\mtcSfont}{\small\rm} % Section entries font
+	\DeclareRobustCommand{\mtifont}{\small\bf} % title of minitoc font
+	%\DeclareRobustCommand{\mtcfont}{\tiny\rm}
+	%\DeclareRobustCommand{\mtcSfont}{\tiny\bf}
+	%\DeclareRobustCommand{\mtcSSfont}{\tiny\bf}
+	\let \Oldminitoc \minitoc 
+	\DeclareRobustCommand{\minitoc}{\Oldminitoc \vspace{12pt}} % add auto-vspace after \minitoc's
+	\DeclareRobustCommand{\mtctitle}{مطالب این فصل}
+	\AtBeginDocument{\dominitoc} %initialization
+\fi
+
+\RequirePackage{sadeghcustomizations-commands}
+

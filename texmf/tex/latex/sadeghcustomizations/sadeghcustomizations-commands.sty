@@ -1,0 +1,28 @@
+% Package for Sadegh-XePersian customizations
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sadeghcustomizations-commands}[2012/12/31 Sadegh-XePersian Custom Commands]
+
+\DeclareRobustCommand*{\name}[3][]{% % Name translation. params: Foreign name in Persian, its original latin form, optional rtl note
+	\ifthenelse{\isempty{#1}}%
+		{\emph{#2}\LTRfootnote{ #3}}% if #1 is empty
+		{\emph{#2}\footnote{\lr{#3 }؛ #1}}% if #1 is not empty
+}
+\DeclareRobustCommand*{\نام}[3][]{\name[#1]{#2}{#3}}
+\DeclareRobustCommand*{\abbr}[2]{\lr{#1}\LTRfootnote{ #2}} % Abbreviation. params: latin abbreviation, full latin
+\DeclareRobustCommand*{\abbrf}[3]{\lr{#1}\LTRfootnote{ #2}}
+
+%\addtolength{\parskip}{2mm}
+% SVG (PDF+LaTeX) graphics. The SVG files must have been converted to PDF+LaTeX and the path to .pdf file added to the search path of images
+\let\Oldsmash\smash
+\DeclareRobustCommand{\includesvg}[2][]{% required:the SVG file name without extension.If any thing should be persian, must be defined in \rl{}. optional: width
+	\ifthenelse{\isempty{#1}}%
+		{}% if #1 is empty
+		{\def\svgwidth{#1}}% if #1 is not empty
+	\begin{latin}%
+	{%restrict the renew to this block only
+	\DeclareRobustCommand{\transparent}[1]{#1} % transparent package doesn't work with XeTeX but the .pdf_tex files need it
+	\DeclareRobustCommand{\smash}[1]{\Oldsmash{\rl{##1}}} % texts are Persian by default
+	\input{#2.pdf_tex}%
+	}%
+	\end{latin}%
+}

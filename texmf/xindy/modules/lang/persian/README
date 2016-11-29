@@ -1,0 +1,3 @@
+Add utf8 persian support to xindy. Copy this folder to /usr/share/xindy/lang or texmf/xindy/modules/lang in texlive portable besides other languages. rename it to "persian" 
+
+For more info see: http://www.parsilatex.com/forum/SMF/index.php?topic=351.0

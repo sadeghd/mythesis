@@ -1,0 +1,205 @@
+% Package for Sadegh-XePersian customizations
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sadeghcustomizations-glossary}[2012/12/31 Sadegh-XePersian Glossary Customizations]
+
+% http://texdoc.net/texmf-dist/doc/latex/base/clsguide.pdf#page=21
+% \DeclareRobustCommand {⟨cmd⟩} [⟨num⟩] [⟨default⟩] {⟨definition⟩}
+% \DeclareRobustCommand* {⟨cmd⟩} [⟨num⟩] [⟨default⟩] {⟨definition⟩}
+% This command takes the same arguments as \newcommand but it declares a
+% robust command, even if some code within the ⟨definition⟩ is fragile. You can use
+% this command to define new robust commands, or to redefine existing commands
+% and make them robust. A log is put into the transcript file if a command is
+% redefined.
+% The *-forms of these commands should be used to define commands that are
+% not, in TEX terms, long. This can be useful for error-trapping with commands
+% whose arguments are not intended to contain whole paragraphs of text.
+
+\glsdisablehyper % disable hyperlinks
+
+\newglossarystyle{persian-to-english}{%
+%	\glossarystyle{listdotted}% the base style
+	% put the glossary in a two column page and description (as in listdotted style) environment:
+	\renewenvironment{theglossary}%
+		{\begin{multicols}{2}\begingroup \flushleft }%
+		{\endgroup \end{multicols}}%
+%	\renewenvironment{theglossary}{}{}%
+	% have nothing after \begin{theglossary}:
+	\renewcommand*{\glossaryheader}{}%
+	% have nothing between glossary groups:
+	\renewcommand*{\glsgroupheading}[1]{}%
+	\renewcommand*{\glsgroupskip}{}%
+	% set how each entry should appear: \glossaryentryfield{label}{formatted name}{description}{symbol}{number list}
+	\renewcommand*{\glossaryentryfield}[5]{%
+		\glstarget{##1}{##2}% persian term
+		\dotfill%dots
+		\space \lr{##3} \\%
+%		\dotfill%
+%		\space {##5} \\%translation term
+	}%
+	% set how sub-entries appear:
+	\renewcommand*{\glossarysubentryfield}[6]{%
+		\glossaryentryfield{##2}{##3}{##4}{##5}{##6}%
+	}%
+}
+% ========= Glossary styles (put in files) =========
+\newglossarystyle{english-to-persian}{%
+%	\glossarystyle{listdotted}% the base style
+	% put the glossary in a two column page and description (as in listdotted style) environment:
+	\renewenvironment{theglossary}%
+		{\begin{multicols}{2}\begingroup \flushright }%
+		{\endgroup \end{multicols}}%
+%	\renewenvironment{theglossary}{\Latin{}}{\Persian{}}%
+	% have nothing after \begin{theglossary}:
+	\renewcommand*{\glossaryheader}{}%
+	% have nothing between glossary groups:
+	\renewcommand*{\glsgroupheading}[1]{}%
+	\renewcommand*{\glsgroupskip}{}%
+	% set how each entry should appear:
+	\renewcommand*{\glossaryentryfield}[5]{%
+		\glstarget{##1}{##2}% persian term
+		\dotfill%dots
+		\space \rl{##3} \\%translation term
+	}%
+	% set how sub-entries appear:
+	\renewcommand*{\glossarysubentryfield}[6]{%
+		\glossaryentryfield{##2}{##3}{##4}{##5}{##6}%
+	}%
+}
+
+% ========= GLOSSARIES =========
+%\newcommand{\convert2key}[1]{%
+%	\StrSubstitute	{#1}{~}{-}%
+%}
+
+\newglossary{p2e-terms}{fa.gls}{fa.glo}{واژه‌نامهٔ فارسی به انگلیسی} % persian to english
+\newglossary{e2p-terms}{en.gls}{en.glo}{English to Persian Glossary} % english to persian
+
+%\newcommand{\convertkey}[1]{\StrSubstitute{\StrSubstitute{#1}{~}{-}}{ }{-}}
+
+%\renewcommand{\glspluralsuffix}{‌ها}
+
+\DeclareRobustCommand*{\newtrans}[3][]{% params: persian, english translations, first optional is a key
+\newtranspl[#1]{#2}{#3}{#2‌ها}%
+}
+\DeclareRobustCommand*{\newtranspl}[4][]{% params: persian, english, plural form of persian, first optional is a key
+\ifthenelse{\isempty{#1}}{\def\key{#2}}{\def\key{#1}}%
+\newglossaryentry{en:\key}{type={e2p-terms}, name={#3}, description={#2}}% english glossary
+%	\newglossaryentry{fa:\key}{type={p2e-terms}, name={#2}, description={#3}}% persian glossary
+\newglossaryentry{fa:\key}{type={p2e-terms}, name={#2}, plural={#4}, 
+description={#3}}% persian glossary
+}
+%\input{glossaries}
+%\loadglsentries[p2e-terms]{glossary.fa} % not using \newtrans macro
+%\loadglsentries[e2p-terms]{glossary.en} % not using \newtrans macro
+%\loadglsentries{glossary} % using \newtrans macro
+
+% ========= END OF GLOSSARIES =========
+% Show a translation and footnote it.
+% Params (the same as \glsdisplayfirst):{text}{description}{symbol}{insert}
+% insert can possibly be filled with some notes on the translation.
+\DeclareRobustCommand*{\showTransFirst}[4]{%  translation for the first time
+%\ifthenelse{\isempty{#4}}% we need to check it because \isempty{#4} may not work!
+\ifdefempty{#4}%
+{\textit{#1}\LTRfootnote{ #2}}% if #4 is empty (no notes) 
+{\textit{#1}\RTLfootnote{ \lr{#2}؛  #4}}% if #4 is not empty
+}
+
+\DeclareRobustCommand*{\showTrans}[4]{% translation for next times
+%\ifthenelse{\isempty{#4}}% we need to check it because \isempty{#4} may not work!
+\ifdefempty{#4}%
+{#1}% if #4 is empty (no notes) 
+{\textit{#1}\RTLfootnote{ #4}}% if #4 is not empty
+}
+
+% These commands are now obsolote, we use \renewcommand*{\glsentryfmt}{...} instead!
+%\defglsdisplayfirst[p2e-terms]{\showTransFirst{#1}{#2}{#3}{#4}}% protect fragile commands
+%\defglsdisplay[p2e-terms]{\showTrans{#1}{#2}{#3}{#4}}
+
+% \renewcommand*{\glsentryfmt}{%
+%     \ifglsused{\glslabel}%
+%     {\showTrans{\glsentrytext{\glslabel}}{\glsentrydesc{\glslabel}}{\glsentrysymbol{\glslabel}}{\glsinsert}}% other times
+%     {\showTransFirst{\glsentrytext{\glslabel}}{\glsentrydesc{\glslabel}}{\glsentrysymbol{\glslabel}}{\glsinsert}}% first time
+% }%
+\renewcommand*{\glsentryfmt}{%
+	\let\myglsinsert\glsinsert%
+	\def\glsinsert{}% prevent \glsgenentryfmt to append \glsinsert
+    \ifglsused{\glslabel}%
+    {\showTrans{\glsgenentryfmt}{\glsentrydesc{\glslabel}}{\glsentrysymbol{\glslabel}}{\myglsinsert}}% other times
+    {\showTransFirst{\glsgenentryfmt}{\glsentrydesc{\glslabel}}{\glsentrysymbol{\glslabel}}{\myglsinsert}}% first time
+}%
+
+% Symbol may temporarily used to keep some notes on the translation.
+% It must be replaced with a user1 key which now raises error, texlive must be upgraded.
+\DeclareRobustCommand*{\term}[2][]{%
+\glsadd{en:#2}%
+%\ifthenelse{\isempty{#1}}{\gls{fa:#2}[]}{\gls{fa:#2}[#1]}%
+%\ifdefempty{#1}{\gls{fa:#2}[]}{
+\gls{fa:#2}[#1]%
+%}%
+}
+\DeclareRobustCommand*{\termpl}[2][]{%
+\glsadd{en:#2}%
+%\ifthenelse{\isempty{#1}}{\glspl{fa:#2}[]}{\glspl{fa:#2}[#1]}%
+%\ifdefempty{#1}{\glspl{fa:#2}[]}{
+\glspl{fa:#2}[#1]%
+%}%
+}
+%=========== Print Glossaries ===============
+% see: http://www.parsilatex.com/forum/SMF/index.php?topic=345.0
+%\glossarystyle{persian-to-english}
+%\def\glossaryname{واژه‌نامه فارسی به انگلیسی}
+%\printglossaries
+
+\DeclareRobustCommand*{\printpersianglossary}[1][واژه‌نامهٔ فارسی به انگلیسی]{{%
+	\phantomsection % hyperref: enable hyperlinking from the table of contents to this point
+\ifx\sadegh@wehavechapter\undefined %
+	\addcontentsline{toc}{section}{#1} % add a line in the Table of Contents (first option, toc), it will be like the ones 
+\else
+	\addcontentsline{toc}{chapter}{#1} % add a line in the Table of Contents (first option, toc), it will be like the ones 
+\fi
+	\renewcommand{\glossarymark}[1]{\markboth{##1}}% correct handling of page header
+	\printglossary[type={p2e-terms},style={persian-to-english},title={#1}]%
+}}
+
+%\DeclareRobustCommand*{\printenglishglossary}[1][English to Persian Glossary]{{%
+%	\begin{latin}%
+%	\phantomsection % hyperref: enable hyperlinking from the table of contents to this point
+%	\addcontentsline{toc}{chapter}{\noexpand\lr{#1}} % add a line in the Table of Contents (first option, toc), it will be like the ones 
+%	\renewcommand{\glossarymark}[1]{\markboth{\lr{##1}}}% correct handling of page header
+%	\printglossary[type={e2p-terms},style={english-to-persian},title={#1}]\end{latin}%
+%}}
+
+\DeclareRobustCommand*{\printenglishglossary}[1][واژه‌نامهٔ انگلیسی به فارسی]{{%
+	\phantomsection % hyperref: enable hyperlinking from the table of contents to this point
+\ifx\sadegh@wehavechapter\undefined %
+	\addcontentsline{toc}{section}{#1} % add a line in the Table of Contents (first option, toc), it will be like the ones 
+\else
+	\addcontentsline{toc}{chapter}{#1} % add a line in the Table of Contents (first option, toc), it will be like the ones 
+\fi
+	\renewcommand{\glossarymark}[1]{\markboth{##1}}% correct handling of page header
+	\begin{latin}%
+	\printglossary[type={e2p-terms},style={english-to-persian},title={\rl{#1}}]%
+	\end{latin}%
+}}
+
+% Reset the first-use flag of the transaltion glossareis
+\DeclareRobustCommand*{\resettranslations}{\glsresetall[e2p-terms,p2e-terms]}
+
+
+%\DeclareRobustCommand*{\trans}[3][]{% Translation. params: translation, original latin term, optional rtl note
+%	\ifthenelse{\isempty{#1}}%
+%		{\emph{#2}\LTRfootnote{ #3}}% if #1 is empty
+%		{\emph{#2}\footnote{\lr{#3 }؛ #1}}% if #1 is not empty
+%}
+\DeclareRobustCommand*{\trans}[3][]{% Translation. params: translation, original latin term, optional rtl note
+\newtrans{#2}{#3}% add to glossary
+\term[#1]{#2}%cite the added word
+}
+
+\DeclareRobustCommand*{\واژه}[2][]{\term[#1]{#2}}
+\DeclareRobustCommand*{\واژهجمع}[2][]{\termpl[#1]{#2}}
+\DeclareRobustCommand*{\ترجمهجدید}[3][]{\newtrans[#1]{#2}{#3}}
+\DeclareRobustCommand*{\ترجمهجدیدوجمع}[4][]{\newtranspl[#1]{#2}{#3}{#4}}
+
+\DeclareRobustCommand*{\ترجمه}[3][]{\trans[#1]{#2}{#3}}
+\DeclareRobustCommand*{\transf}[3]{\trans[#3]{#1}{#2}}
